@@ -21,13 +21,17 @@ public class DatabaseExecutor {
             stmt.execute(createTablesScript); // Execute the script
             System.out.println("Tables created successfully."); // Print confirmation
 
-            // Execute script to find the most often booked aircraft by gold status members
-            String mostOftenBookedAircraftScript = readSqlFile("sql/most_often_booked_aircraft.sql");
-            ResultSet rs = stmt.executeQuery(mostOftenBookedAircraftScript); // Execute query
-            while (rs.next()) {
-                System.out.println("Most often booked aircraft by gold status members: " + rs.getString("aircraft") + " with " + rs.getInt("booking_count") + " bookings."); // Print result
-            }
-            rs.close(); // Close the result set
+            // Execute SQL scripts
+            executeSqlScript(stmt, "sql/total_flights.sql");
+            executeSqlScript(stmt, "sql/average_flight_distance.sql");
+            executeSqlScript(stmt, "sql/average_seats.sql");
+            executeSqlScript(stmt, "sql/average_miles_by_status.sql");
+            executeSqlScript(stmt, "sql/max_miles_by_status.sql");
+            executeSqlScript(stmt, "sql/total_boeing_aircraft.sql");
+            executeSqlScript(stmt, "sql/flights_between_300_and_2000.sql");
+            executeSqlScript(stmt, "sql/average_flight_distance_by_status.sql");
+            executeSqlScript(stmt, "sql/most_often_booked_aircraft_by_gold.sql");
+
         } catch (SQLException e) {
             System.out.println("An error occurred while executing the SQL scripts: " + e.getMessage()); // Handle SQL exceptions
         } catch (IOException e) {
@@ -38,4 +42,14 @@ public class DatabaseExecutor {
     private static String readSqlFile(String filename) throws IOException {
         return new String(Files.readAllBytes(Paths.get(filename))); // Read file content
     }
+
+    private static void executeSqlScript(Statement stmt, String scriptFile) throws IOException, SQLException {
+        String sql = readSqlFile(scriptFile);
+        ResultSet rs = stmt.executeQuery(sql);
+        while (rs.next()) {
+            System.out.println(rs.getString(1) + ": " + rs.getString(2));
+        }
+        rs.close();
+    }
 }
+
